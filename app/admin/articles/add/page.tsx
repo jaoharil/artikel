@@ -5,6 +5,7 @@ import AdminSidebar from '@/components/layout/AdminSidebar';
 import AdminHeader from '@/components/layout/AdminHeader';
 import api from '@/lib/axios';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function AdminAddArticlePage() {
   const [thumbnail, setThumbnail] = useState<File | null>(null);
@@ -57,10 +58,10 @@ export default function AdminAddArticlePage() {
         content,
         userId,
         categoryId,
-        imageUrl: '', // kalau mau support upload nanti beda lagi
+        imageUrl: '',
       };
 
-      await api.post('/articles', payload); // 🔥 kirim JSON, bukan FormData!
+      await api.post('/articles', payload);
 
       alert('Article uploaded successfully!');
       window.location.href = '/admin/articles';
@@ -92,7 +93,7 @@ export default function AdminAddArticlePage() {
               <input type="file" accept="image/*" onChange={handleThumbnailChange} className="hidden" id="thumbnail" />
               <label htmlFor="thumbnail" className="block cursor-pointer">
                 {previewImage ? (
-                  <img src={previewImage} alt="Thumbnail Preview" className="mx-auto h-32 object-cover" />
+                  <Image src={previewImage} alt="Thumbnail Preview" className="mx-auto h-32 object-cover" />
                 ) : (
                   <div className="text-gray-400">
                     <p>📷</p>

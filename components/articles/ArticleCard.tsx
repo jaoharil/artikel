@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function ArticleCard({ article }: { article: any }) {
   // Format tanggal
@@ -12,7 +13,7 @@ export default function ArticleCard({ article }: { article: any }) {
 
   return (
     <Link href={`/articles/${article.id}`} className="block rounded-3xl overflow-hidden shadow hover:shadow-lg transition bg-white">
-      <img src={article.imageUrl || '/bg.jpg'} alt={article.title} className="w-full h-48 object-cover" />
+      <Image src={article.imageUrl || '/bg.jpg'} alt={article.title} width={100} height={100} className="w-full h-48 object-cover" />
       <div className="p-4">
         {/* DATE */}
         <p className="text-xs text-gray-400">{formattedDate}</p>

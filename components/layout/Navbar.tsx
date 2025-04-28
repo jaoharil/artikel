@@ -2,11 +2,12 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Navbar() {
   const [user, setUser] = useState<any>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [showLogoutModal, setShowLogoutModal] = useState(false); // 🔥 Tambahkan ini
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -54,14 +55,14 @@ export default function Navbar() {
 
       {/* Logo */}
       <div className="text-2xl font-bold">
-        <img src="/logo.png" alt="Logo" className="h-8" />
+        <Image src="/logo.png" alt="Logo" className="h-8" width={100} height={100} />
       </div>
 
       {/* Dropdown Profile */}
       <div className="relative" ref={dropdownRef}>
         <div className="flex items-center gap-2 cursor-pointer" onClick={() => setDropdownOpen(!dropdownOpen)}>
           <span className="text-white hidden md:inline text-sm md:text-base">{user ? `Hi, ${user.username}!` : 'Hi, Guest!'}</span>
-          <img src="/profile.jpg" alt="Profile" className="h-8 w-8 md:h-10 md:w-10 rounded-full object-cover border-2 border-white" />
+          <Image src="/profile.jpg" alt="Profile" width={100} height={100} className="h-8 w-8 md:h-10 md:w-10 rounded-full object-cover border-2 border-white" />
         </div>
 
         {dropdownOpen && (
@@ -71,7 +72,7 @@ export default function Navbar() {
             </Link>
             <button
               onClick={() => {
-                setShowLogoutModal(true); // 🔥 Buka modal logout custom
+                setShowLogoutModal(true);
                 setDropdownOpen(false);
               }}
               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"

@@ -30,7 +30,7 @@ const ArticleDetail: NextPage = () => {
         {/* Hero Image */}
         <div className="w-full h-64 md:h-96 relative mb-8 rounded-lg overflow-hidden">
           <Image
-            src="/images/article-hero.jpg" // Gambar kamu, pastikan sudah ada file-nya!
+            src="/images/article-hero.jpg" 
             alt="Figma Dev Mode"
             fill
             className="object-cover"

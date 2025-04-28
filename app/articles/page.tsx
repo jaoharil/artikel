@@ -59,7 +59,7 @@ export default function ArticlesPage() {
       )}
 
       {/* Hero Section */}
-      <div className="relative bg-[url('/bg.jpg')] bg-cover bg-center text-white">
+      <div className="relative bg-[url('/bg.jpg')] bg-cover bg-center text-white ">
         <div className="absolute inset-0 bg-[#2563EBDB] pointer-events-none"></div>
 
         {/* Navbar */}

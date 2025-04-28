@@ -1,10 +1,11 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import api from '@/lib/axios';
 import AdminSidebar from '@/components/layout/AdminSidebar';
 import AdminHeader from '@/components/layout/AdminHeader';
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import api from '@/lib/axios';
+import Image from 'next/image';
 
 export default function AdminArticlesPage() {
   const [articles, setArticles] = useState<any[]>([]);
@@ -12,109 +13,124 @@ export default function AdminArticlesPage() {
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchArticles() {
       try {
         const res = await api.get('/articles', {
           params: { page: currentPage, search, category },
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`, // ⬅️ kirim token kalau perlu
-          },
         });
         setArticles(res.data.data);
         setTotalPages(res.data.meta?.last_page || 1);
       } catch (err) {
-        console.error('Error fetch articles:', err);
+        console.error(err);
       }
     }
     fetchArticles();
   }, [search, category, currentPage]);
 
+  const handleDelete = async () => {
+    if (!selectedId) return;
+
+    try {
+      await api.delete(`/articles/${selectedId}`);
+      setArticles((prev) => prev.filter((article) => article.id !== selectedId));
+      setShowDeleteModal(false);
+    } catch (err) {
+      console.error('Failed to delete article:', err);
+      alert('Failed to delete article');
+    }
+  };
+
   return (
     <div className="min-h-screen flex">
-      {/* Sidebar */}
       <AdminSidebar />
 
-      {/* Main Content */}
-      <main className="flex-1 bg-gray-50 p-6 overflow-x-auto">
-        {/* Header */}
+      <main className="flex-1 bg-gray-50 p-6">
         <AdminHeader title="Articles" />
 
-        {/* Total Article & Filter */}
-        <p className="text-sm text-gray-700 mb-4">Total Articles: {articles.length}</p>
-        <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
-          <div className="flex flex-wrap items-center gap-2">
-            <select value={category} onChange={(e) => setCategory(e.target.value)} className="px-4 py-2 rounded border text-sm">
-              <option value="">All Categories</option>
+        {/* Filter */}
+        <p className="mb-4">Total Articles: {articles.length}</p>
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex gap-2">
+            <select value={category} onChange={(e) => setCategory(e.target.value)} className="border px-4 py-2 rounded">
+              <option value="">Category</option>
               <option value="technology">Technology</option>
               <option value="design">Design</option>
-              <option value="interview">Interview</option>
             </select>
-            <input type="text" placeholder="Search by title" value={search} onChange={(e) => setSearch(e.target.value)} className="px-4 py-2 rounded border text-sm" />
+            <input type="text" placeholder="Search title" value={search} onChange={(e) => setSearch(e.target.value)} className="border px-4 py-2 rounded" />
           </div>
           <Link href="/admin/articles/add">
-            <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">+ Add Article</button>
+            <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">+ Add Articles</button>
           </Link>
         </div>
 
-        {/* Table Articles */}
-        <div className="bg-white shadow rounded-lg overflow-x-auto">
-          <table className="min-w-full text-sm text-left">
+        {/* Table */}
+        <div className="overflow-x-auto bg-white rounded shadow">
+          <table className="w-full text-sm">
             <thead className="bg-gray-100">
               <tr>
-                <th className="px-6 py-3">Thumbnail</th>
-                <th className="px-6 py-3 w-4">Title</th>
-                <th className="px-6 py-3">Category</th>
-                <th className="px-6 py-3">Created At</th>
-                <th className="px-6 py-3">Action</th>
+                <th className="p-2">Thumbnails</th>
+                <th className="p-2">Title</th>
+                <th className="p-2">Category</th>
+                <th className="p-2">Created</th>
+                <th className="p-2">Action</th>
               </tr>
             </thead>
             <tbody>
-              {articles.length > 0 ? (
-                articles.map((article) => (
-                  <tr key={article.id} className="border-t">
-                    <td className="px-6 py-3">
-                      <img src={article.imageUrl || '/bg.jpg'} alt={article.title} className="h-12 w-12 object-cover rounded" />
-                    </td>
-                    <td className="px-6 py-3">{article.title}</td>
-                    <td className="px-6 py-3">{article.category?.name ?? '-'}</td>
-                    <td className="px-6 py-3">{new Date(article.createdAt).toLocaleDateString()}</td>
-                    <td className="px-6 py-3 flex flex-wrap gap-2">
-                      <Link href={`/articles/${article.id}`} className="text-blue-600 hover:underline">
-                        Preview
-                      </Link>
-                      <Link href={`/admin/articles/edit/${article.id}`} className="text-green-600 hover:underline">
-                        Edit
-                      </Link>
-                      <button onClick={() => alert('Confirm delete?')} className="text-red-600 hover:underline">
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={5} className="text-center py-6">
-                    No articles found.
+              {articles.map((article) => (
+                <tr key={article.id} className="border-t">
+                  <td className="p-2">
+                    <Image src={article.imageUrl || '/bg.jpg'} alt={article.title} width={100} height={100} className="h-12 w-12 object-cover rounded" />
+                  </td>
+                  <td className="p-2 w-3/12">{article.title}</td>
+                  <td className="p-2">{article.category?.name || '-'}</td>
+                  <td className="p-2">{new Date(article.createdAt).toLocaleString()}</td>
+                  <td className="p-2 space-x-2">
+                    <Link href={`/articles/${article.id}`} className="text-blue-500 hover:underline">
+                      Preview
+                    </Link>
+                    <Link href={`/admin/articles/edit/${article.id}`} className="text-green-500 hover:underline">
+                      Edit
+                    </Link>
+                    <button
+                      onClick={() => {
+                        setSelectedId(article.id);
+                        setShowDeleteModal(true);
+                      }}
+                      className="text-red-500 hover:underline"
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
-              )}
+              ))}
             </tbody>
           </table>
         </div>
-
-        {/* Pagination */}
-        <div className="flex justify-center mt-6 gap-2">
-          <button disabled={currentPage <= 1} onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50">
-            Prev
-          </button>
-          <span className="px-3 py-1">{currentPage}</span>
-          <button disabled={currentPage >= totalPages} onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50">
-            Next
-          </button>
-        </div>
       </main>
+
+      {/* Delete Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 flex items-center  justify-center  bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded-lg  w-auto">
+            <h2 className="text-lg font-semibold mb-2">Delete Articles</h2>
+            <p className="text-gray-600 mb-6 text-sm">
+              Deleting this article is permanent and cannot be undone. <br /> All related content will be removed.
+            </p>
+            <div className="flex justify-end gap-4">
+              <button onClick={() => setShowDeleteModal(false)} className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
+                Cancel
+              </button>
+              <button onClick={handleDelete} className="px-4 py-2 bg-[#DC2626] text-white rounded hover:bg-red-700">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

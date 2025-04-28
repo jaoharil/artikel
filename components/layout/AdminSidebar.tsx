@@ -3,6 +3,7 @@
 import { LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 
 export default function AdminSidebar() {
   const [user, setUser] = useState<any>(null);
@@ -42,7 +43,7 @@ export default function AdminSidebar() {
       )}
       {/* Logo */}
       <div className="text-2xl font-bold mb-8">
-        <img src="/logo.png" alt="Logo" className="h-8" />
+        <Image src="/logo.png" alt="Logo" className="h-8" width={100} height={100} />
       </div>
 
       {/* Menu */}
@@ -56,7 +57,7 @@ export default function AdminSidebar() {
       {/* Logout */}
       <button
         onClick={() => {
-          setShowLogoutModal(true); // 🔥 Buka modal logout custom
+          setShowLogoutModal(true);
           setDropdownOpen(false);
         }}
         className="block w-full text-left  text-sm text-white hover:text-blue-300"

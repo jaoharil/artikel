@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
-import api from '@/lib/axios'; // ✅ pakai 'api' bukan 'axios'
+import api from '@/lib/axios';
+import Image from 'next/image';
 
 const loginSchema = z.object({
   username: z.string().min(1, 'Please enter your username'),
@@ -93,7 +94,7 @@ export default function AuthForm({ type }: AuthFormProps) {
   return (
     <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-sm text-left">
       <div className="flex justify-center mb-6">
-        <img src="/logo.png" alt="Logo" className="h-6" />
+        <Image src="/logo.png" alt="Logo" className="h-6" width={100} height={100} />
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -122,8 +123,8 @@ export default function AuthForm({ type }: AuthFormProps) {
             <label className="text-sm font-medium">Role</label>
             <select {...register('role')} className="w-full mt-1 border rounded-md px-3 py-2 text-sm">
               <option value="">Select Role</option>
-              <option value="User">User</option> {/* Capital U */}
-              <option value="Admin">Admin</option> {/* Capital A */}
+              <option value="User">User</option>
+              <option value="Admin">Admin</option>
             </select>
             {errors.role && <p className="text-xs text-red-500 mt-1">{errors.role.message}</p>}
           </div>

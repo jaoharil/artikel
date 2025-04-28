@@ -2,6 +2,7 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import api from '@/lib/axios';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface DetailArticlePageProps {
   params: {
@@ -18,7 +19,7 @@ export default async function DetailArticlePage({ params }: DetailArticlePagePro
   try {
     const res = await api.get('/articles');
     const articles = res.data.data;
-    article = articles.find((a: any) => a.id === id); // 🔥 cari manual
+    article = articles.find((a: any) => a.id === id);
   } catch (err) {
     console.error('Error fetching article:', err);
   }
@@ -51,7 +52,7 @@ export default async function DetailArticlePage({ params }: DetailArticlePagePro
         </p>
         <h1 className="text-2xl md:text-4xl font-bold text-center mt-4">{article.title}</h1>
 
-        <img src={article.imageUrl || '/bg.jpg'} alt={article.title} className="w-full h-64 md:h-96 object-cover rounded-lg my-8" />
+        <Image src={article.imageUrl || '/bg.jpg'} alt={article.title} width={100} height={100} className="w-full h-64 md:h-96 object-cover rounded-lg my-8" />
 
         <article className="text-gray-700 leading-relaxed space-y-4">
           {article.content.split('\n').map((paragraph: string, index: number) => (
@@ -65,7 +66,7 @@ export default async function DetailArticlePage({ params }: DetailArticlePagePro
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {otherArticles.map((other: any) => (
               <Link key={other.id} href={`/articles/${other.id}`} className="block rounded overflow-hidden shadow hover:shadow-lg transition bg-white">
-                <img src={other.imageUrl || '/default-article.jpg'} alt={other.title} className="w-full h-36 object-cover" />
+                <Image src={other.imageUrl || '/default-article.jpg'} alt={other.title} width={100} height={100} className="w-full h-36 object-cover" />
                 <div className="p-4">
                   <p className="text-sm text-gray-500 mb-1">{other.category?.name ?? 'Uncategorized'}</p>
                   <h3 className="text-md font-semibold">{other.title}</h3>

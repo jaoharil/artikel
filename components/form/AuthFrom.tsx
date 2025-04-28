@@ -42,24 +42,49 @@ export default function AuthForm({ type }: AuthFormProps) {
   const onSubmit = async (data: FormData) => {
     setLoading(true);
     try {
-      const endpoint = type === 'login' ? '/auth/login' : '/auth/register';
+      const now = new Date().toISOString(); // generate waktu ISO string sekarang
 
-      console.log('Kirim ke endpoint:', endpoint);
-      console.log('Data dikirim:', data);
-
-      await api.post(endpoint, {
+      const payload = {
         username: data.username,
         password: data.password,
-        ...(type === 'register' && { role: data.role }), // role hanya dikirim saat register
-      });
+        ...(type === 'register' && {
+          role: data.role,
+          createdAt: now,
+          updatedAt: now,
+        }),
+      };
 
-      window.location.href = '/articles'; // ✅ setelah sukses login atau daftar
+      console.log('Payload yang dikirim:', payload);
+
+      const res = await api.post(type === 'login' ? '/auth/login' : '/auth/register', payload);
+
+      // Simpan token dan user
+      localStorage.setItem('token', res.data.token);
+      localStorage.setItem(
+        'user',
+        JSON.stringify({
+          username: data.username,
+          role: type === 'register' ? data.role : 'User',
+        })
+      );
+
+      // Redirect sesuai role
+      const userRole = (type === 'register' ? data.role : 'User')?.toLowerCase();
+      if (userRole === 'admin') {
+        window.location.href = '/admin/articles';
+      } else {
+        window.location.href = '/articles';
+      }
     } catch (err: any) {
-      console.error('Full error:', err);
+      console.error('Error saat login/register:', err.response?.data);
 
-      const msg = err.response?.data?.message || err.response?.data?.error || JSON.stringify(err.response?.data) || 'Terjadi kesalahan saat login/register';
+      const errorMessage = err.response?.data?.error;
 
-      alert(msg);
+      if (errorMessage?.includes('Unique constraint failed')) {
+        alert('Username sudah digunakan. Silakan pilih username lain.');
+      } else {
+        alert(errorMessage || 'Terjadi kesalahan saat login/register');
+      }
     } finally {
       setLoading(false);
     }
